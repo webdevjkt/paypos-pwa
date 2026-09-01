@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Admin SaaS Hub - PayPOS Multi-Tenant</title>
+  
+  <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
+
+  <style>
+    body {
+      background: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+    }
+    .admin-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #334155;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .saas-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: #1e293b;
+      border: 1px solid #475569;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+    .admin-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .admin-stat-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .admin-stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      background: #334155;
+    }
+    .admin-stat-val {
+      font-size: 24px;
+      font-weight: 900;
+      color: #fff;
+    }
+    .admin-stat-lbl {
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .tenant-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 14px;
+    }
+    .tenant-table th {
+      background: #0f172a;
+      padding: 14px 16px;
+      color: #94a3b8;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid #334155;
+    }
+    .tenant-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #334155;
+      color: #f1f5f9;
+    }
+    .tenant-table tr:hover {
+      background: rgba(51, 65, 85, 0.4);
+    }
+    .plan-badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .plan-badge.standard { background: #0284c7; color: #fff; }
+    .plan-badge.pro { background: #059669; color: #fff; }
+    .plan-badge.premium { background: #7c3aed; color: #fff; }
+    .plan-badge.trial { background: #d97706; color: #fff; }
+    .status-active { color: #10b981; font-weight: 700; }
+    .status-suspended { color: #ef4444; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <!-- Super Admin Authentication Lock Screen -->
+  <div id="admin-auth-overlay" style="position: fixed; inset: 0; background: #0b0f19; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 16px;">
+    <div style="background: #1e293b; border: 1px solid #334155; border-radius: 20px; padding: 32px; width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center;">
+      <div style="width: 56px; height: 56px; border-radius: 16px; background: #ea580c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px;">
+        👑
+      </div>
+      <h2 style="font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 6px;">Super Admin SaaS Portal</h2>
+      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 20px;">Masukkan akun master untuk mengelola semua perusahaan klien</p>
+
+      <form id="admin-login-form" style="display: flex; flex-direction: column; gap: 14px; text-align: left;">
+        <div class="input-group">
+          <label style="color: #cbd5e1; font-size: 12px; font-weight: 700;">Username Super Admin</label>
+          <input type="text" id="sa-username" class="input-styled" style="background: #0f172a; color: #fff; border-color: #475569;" required placeholder="Masukkan Username Super Admin" autocomplete="off">
+        </div>
+
+        <div class="input-group">
+          <label style="color: #cbd5e1; font-size: 12px; font-weight: 700;">Password / Master PIN</label>
+          <div style="position: relative; display: flex; align-items: center;">
+            <input type="password" id="sa-password" class="input-styled" style="background: #0f172a; color: #fff; border-color: #475569; width: 100%; padding-right: 42px;" required placeholder="Masukkan Password / Master PIN" autocomplete="new-password">
+            <button type="button" id="toggle-sa-password" style="position: absolute; right: 10px; background: none; border: none; font-size: 18px; cursor: pointer; color: #94a3b8; display: flex; align-items: center; justify-content: center; padding: 4px;" title="Lihat Password">
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" style="padding: 12px; justify-content: center; font-size: 14px; margin-top: 6px; background: #ea580c;">
+          🔓 Masuk Dashboard Super Admin
+        </button>
+
+        <a href="index.html" style="text-align: center; font-size: 12px; color: #94a3b8; text-decoration: none; margin-top: 4px;">
+          ⬅️ Kembali ke Halaman Kasir
+        </a>
+      </form>
+    </div>
+  </div>
+
+  <div id="admin-main-view" class="admin-container" style="display: none;">
+    <!-- Header -->
+    <header class="admin-header">
+      <div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+          <h1 style="font-size: 24px; font-weight: 900; color: #fff;">👑 Super Admin SaaS Hub</h1>
+          <span class="saas-badge">⚡ Multi-Tenant License Manager</span>
+        </div>
+        <p style="font-size: 13px; color: #94a3b8;">
+          Kelola lisensi (Standard, Pro, Premium), kuota outlet, batas user kasir, dan pantau omset seluruh klien.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <button class="btn-secondary" style="background: #334155; color: #fff; border-color: #475569;" onclick="location.reload()">
+          🔄 Refresh Data
+        </button>
+        <a href="index.html" class="btn-primary" style="text-decoration: none;">
+          🛒 Buka POS Kasir
+        </a>
+      </div>
+    </header>
+
+    <!-- License Plan Overview Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
+      <div style="background: #1e293b; border: 1.5px solid #0284c7; border-radius: 14px; padding: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span class="plan-badge standard">📦 STANDARD</span>
+          <span style="font-size: 11px; color: #38bdf8; font-weight: 700;">Starter</span>
+        </div>
+        <div style="font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 4px;">1 Outlet • 3 User</div>
+        <div style="font-size: 12px; color: #94a3b8;">Cocok untuk usaha tunggal / kedai mandiri</div>
+      </div>
+
+      <div style="background: #1e293b; border: 1.5px solid #059669; border-radius: 14px; padding: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span class="plan-badge pro">⚡ PROFESIONAL</span>
+          <span style="font-size: 11px; color: #34d399; font-weight: 700;">Popular</span>
+        </div>
+        <div style="font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 4px;">2 Outlet • 6 User</div>
+        <div style="font-size: 12px; color: #94a3b8;">Cocok untuk bisnis 2 cabang bertumbuh</div>
+      </div>
+
+      <div style="background: #1e293b; border: 1.5px solid #7c3aed; border-radius: 14px; padding: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span class="plan-badge premium">💎 PREMIUM</span>
+          <span style="font-size: 11px; color: #a78bfa; font-weight: 700;">Enterprise</span>
+        </div>
+        <div style="font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 4px;">4 Outlet • 9 User</div>
+        <div style="font-size: 12px; color: #94a3b8;">Cocok untuk multi-outlet besar & waralaba</div>
+      </div>
+    </div>
+
+    <!-- Super Admin KPI Metrics -->
+    <div class="admin-stats-grid">
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon" style="background: #0284c7; color: #fff;">🏢</div>
+        <div>
+          <div class="admin-stat-lbl">Total Perusahaan</div>
+          <div id="stat-total-tenants" class="admin-stat-val">0</div>
+        </div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon" style="background: #059669; color: #fff;">🧾</div>
+        <div>
+          <div class="admin-stat-lbl">Total Transaksi Kasir</div>
+          <div id="stat-total-transactions" class="admin-stat-val">0</div>
+        </div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon" style="background: #d97706; color: #fff;">💰</div>
+        <div>
+          <div class="admin-stat-lbl">Total Omset Penjualan Klien</div>
+          <div id="stat-total-revenue" class="admin-stat-val">Rp 0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cloudflare D1 Database Central Setting Card (Khusus Super Admin) -->
+    <div class="admin-card" style="margin-bottom: 24px; border: 1.5px solid #ea580c; background: linear-gradient(135deg, #1e293b 0%, #291a13 100%);">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: #ea580c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px;">
+            ⚡
+          </div>
+          <div>
+            <h3 style="font-size: 17px; font-weight: 800; color: #fff; margin: 0;">Pengaturan Pusat Database Cloudflare D1 (Master Server)</h3>
+            <span style="font-size: 12px; color: #cbd5e1;">Konfigurasi endpoint Worker & D1 Database multi-tenant untuk semua toko kasir PayPOS.</span>
+          </div>
+        </div>
+        <span id="cf-admin-status-badge" class="status-badge" style="background: #ea580c; color: #fff; padding: 6px 14px; font-size: 12px;">
+          <span class="status-dot"></span> Memeriksa Status...
+        </span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="input-group">
+          <label style="color: #cbd5e1; font-weight: 700; font-size: 13px;">URL Cloudflare Worker API Backend</label>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <input type="url" id="cf-admin-url-input" class="input-styled" style="flex: 1; min-width: 260px; background: #0f172a; color: #fff; border-color: #475569; font-weight: 700;" placeholder="https://paypos-api.wahyuhermawan788.workers.dev">
+            <button type="button" class="btn-primary" style="padding: 10px 20px; font-size: 13px; background: #ea580c;" onclick="saveAndTestAdminCloudflare()">
+              💾 Simpan & Tes Koneksi
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Add Tenant Modal Trigger & Search -->
+    <div class="admin-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h3 style="font-size: 18px; font-weight: 800; color: #fff;">Daftar Lisensi Perusahaan Klien SaaS</h3>
+          <p style="font-size: 12px; color: #94a3b8;">Pantau paket lisensi, batasan kuota outlet & user kasir untuk setiap perusahaan.</p>
+        </div>
+        <button class="btn-primary" onclick="openAddTenantModal()">
+          <span>➕</span> Daftarkan Klien & Lisensi Baru
+        </button>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="tenant-table">
+          <thead>
+            <tr>
+              <th>Kode Toko</th>
+              <th>Nama Perusahaan</th>
+              <th>Paket Lisensi</th>
+              <th>Batas Kuota</th>
+              <th>Status</th>
+              <th>Total Transaksi</th>
+              <th>Total Omset</th>
+              <th>Kedaluwarsa</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tenant-table-body">
+            <tr>
+              <td colspan="9" style="text-align: center; padding: 30px; color: #94a3b8;">
+                Memuat data perusahaan & lisensi...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tambah Klien Baru -->
+  <div id="modal-tenant" class="modal-overlay">
+    <div class="modal-card" style="max-width: 520px; background: #1e293b; color: #fff; border-color: #334155;">
+      <div class="modal-header" style="border-color: #334155;">
+        <h3 id="modal-tenant-title" style="color: #fff;">Daftarkan Klien & Lisensi Baru</h3>
+        <button class="modal-close-btn" style="color: #94a3b8;" onclick="closeModal()">✕</button>
+      </div>
+      <form id="form-tenant">
+        <div class="modal-body" style="background: #1e293b; gap: 12px;">
+          <div class="input-group">
+            <label style="color: #cbd5e1;">Pilih Paket Lisensi *</label>
+            <select id="add-company-plan" class="input-styled" style="background: #0f172a; color: #fff; border-color: #475569; font-weight: 700;" required>
+              <option value="standard">📦 Standard (1 Outlet • 3 User)</option>
+              <option value="pro" selected>⚡ Profesional (2 Outlet • 6 User)</option>
+              <option value="premium">💎 Premium (4 Outlet • 9 User)</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label style="color: #cbd5e1;">Nama Perusahaan / Brand *</label>
+            <input type="text" id="add-company-name" class="input-styled" style="background: #0f172a; color: #fff; border-color: #475569;" required placeholder="Contoh: Kopi Janji Jiwa">
+          </div>
+
+          <div class="input-group">
+            <label style="color: #cbd5e1;">Kode Perusahaan Unik (Untuk Login Kasir) *</label>
+            <input type="text" id="add-company-code" class="input-styled" style="background: #0f172a; color: #fff; border-color: #475569; text-transform: uppercase;" required placeholder="Contoh: KOPI-JJ">
+          </div>
+
+          <div class="input-group">
+            <label style="color: #cbd5e1;">Nama Pemilik / Owner *</label>
+            <input type="text" id="add-owner-name" class="input-styled" style="background: #0f172a; color: #fff; border-color: #475569;" required placeholder="Nama Owner">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="input-group">
+              <label style="color: #cbd5e1;">Username Owner *</label>
+              <input type="text" id="add-owner-username" class="input-styled" style="background: #0f172a; color: #fff; border-color: #475569;" required placeholder="Contoh: owner" autocomplete="off">
+            </div>
+            <div class="input-group">
+              <label style="color: #cbd5e1;">Password / PIN *</label>
+              <input type="password" id="add-owner-pin" class="input-styled" style="background: #0f172a; color: #fff; border-color: #475569;" required placeholder="Password / PIN" autocomplete="new-password">
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label style="color: #cbd5e1;">Nomor WhatsApp</label>
+            <input type="tel" id="add-phone" class="input-styled" style="background: #0f172a; color: #fff; border-color: #475569;" placeholder="081234567890">
+          </div>
+        </div>
+        <div class="modal-footer" style="background: #0f172a; border-color: #334155;">
+          <button type="button" class="btn-secondary" style="background: #334155; color: #fff; border: none;" onclick="closeModal()">Batal</button>
+          <button type="submit" class="btn-primary">💾 Simpan & Aktifkan Lisensi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Edit / Upgrade Lisensi Tenant -->
+  <div id="modal-edit-plan" class="modal-overlay">
+    <div class="modal-card" style="max-width: 460px; background: #1e293b; color: #fff; border-color: #334155;">
+      <div class="modal-header" style="border-color: #334155;">
+        <h3 style="color: #fff;">Ubah Paket Lisensi Klien</h3>
+        <button class="modal-close-btn" style="color: #94a3b8;" onclick="closeEditPlanModal()">✕</button>
+      </div>
+      <form id="form-edit-plan">
+        <input type="hidden" id="edit-plan-tenant-code">
+        <div class="modal-body" style="background: #1e293b; gap: 14px;">
+          <div>
+            <span style="font-size: 12px; color: #94a3b8;">Perusahaan:</span>
+            <div id="edit-plan-company-name" style="font-size: 16px; font-weight: 800; color: #fff;">-</div>
+            <div id="edit-plan-code-badge" style="font-family: monospace; color: #38bdf8; font-size: 12px;">-</div>
+          </div>
+
+          <div class="input-group">
+            <label style="color: #cbd5e1;">Pilih Lisensi Baru</label>
+            <select id="edit-plan-select" class="input-styled" style="background: #0f172a; color: #fff; border-color: #475569; font-weight: 700;">
+              <option value="standard">📦 Standard (1 Outlet • 3 User)</option>
+              <option value="pro">⚡ Profesional (2 Outlet • 6 User)</option>
+              <option value="premium">💎 Premium (4 Outlet • 9 User)</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label style="color: #cbd5e1;">Status Akun</label>
+            <select id="edit-status-select" class="input-styled" style="background: #0f172a; color: #fff; border-color: #475569; font-weight: 700;">
+              <option value="active">● Aktif</option>
+              <option value="suspended">● Nonaktif / Suspend</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer" style="background: #0f172a; border-color: #334155;">
+          <button type="button" class="btn-secondary" style="background: #334155; color: #fff; border: none;" onclick="closeEditPlanModal()">Batal</button>
+          <button type="submit" class="btn-primary">💾 Simpan Perubahan Lisensi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script>
+    let CF_API_URL = localStorage.getItem('paypos_cf_api_url') || 'https://paypos-api.wahyuhermawan788.workers.dev';
+
+    function showToast(msg, type = 'info') {
+      const c = document.getElementById('toast-container');
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      t.innerHTML = `<span>${type === 'success' ? '✅' : 'ℹ️'}</span><span>${msg}</span>`;
+      c.appendChild(t);
+      setTimeout(() => t.remove(), 3000);
+    }
+
+    async function updateAdminCloudflareUI() {
+      const input = document.getElementById('cf-admin-url-input');
+      const badge = document.getElementById('cf-admin-status-badge');
+      if (input) input.value = CF_API_URL;
+
+      if (badge) {
+        try {
+          const res = await fetch(`${CF_API_URL}/api/health`);
+          if (res.ok) {
+            badge.style.background = '#059669';
+            badge.innerHTML = '<span class="status-dot"></span> D1 Database Terhubung Online';
+          } else {
+            badge.style.background = '#e11d48';
+            badge.innerHTML = '<span class="status-dot"></span> Gagal Merespon (' + res.status + ')';
+          }
+        } catch (e) {
+          badge.style.background = '#e11d48';
+          badge.innerHTML = '<span class="status-dot"></span> Offline / Tidak Terjangkau';
+        }
+      }
+    }
+
+    async function saveAndTestAdminCloudflare() {
+      const input = document.getElementById('cf-admin-url-input');
+      const url = input?.value.trim().replace(/\/+$/, '');
+      if (!url) {
+        showToast('Masukkan URL Cloudflare Worker API', 'error');
+        return;
+      }
+
+      showToast('Menguji koneksi ke Cloudflare D1 Database...', 'info');
+      try {
+        const res = await fetch(`${url}/api/health`);
+        if (!res.ok) throw new Error(`HTTP Status ${res.status}`);
+        
+        CF_API_URL = url;
+        localStorage.setItem('paypos_cf_api_url', url);
+        showToast('✅ Berhasil terhubung ke Cloudflare Workers & D1 Database Master!', 'success');
+        updateAdminCloudflareUI();
+        loadTenants();
+      } catch (err) {
+        showToast('❌ Gagal terhubung: ' + err.message, 'error');
+        updateAdminCloudflareUI();
+      }
+    }
+
+    function openAddTenantModal() {
+      document.getElementById('form-tenant').reset();
+      document.getElementById('add-company-code').value = 'TOKO-' + Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('modal-tenant').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-tenant').classList.remove('active');
+    }
+
+    function openEditPlanModal(code, name, plan, status) {
+      document.getElementById('edit-plan-tenant-code').value = code;
+      document.getElementById('edit-plan-company-name').textContent = name;
+      document.getElementById('edit-plan-code-badge').textContent = 'KODE: ' + code;
+      document.getElementById('edit-plan-select').value = plan || 'standard';
+      document.getElementById('edit-status-select').value = status || 'active';
+      document.getElementById('modal-edit-plan').classList.add('active');
+    }
+
+    function closeEditPlanModal() {
+      document.getElementById('modal-edit-plan').classList.remove('active');
+    }
+
+    // Helper Kuota Lisensi
+    function getPlanQuotaInfo(plan) {
+      const p = (plan || 'standard').toLowerCase();
+      if (p === 'standard') return { label: 'STANDARD', badgeClass: 'standard', quota: '🏢 1 Outlet • 👥 3 User' };
+      if (p === 'pro') return { label: 'PROFESIONAL', badgeClass: 'pro', quota: '🏬 2 Outlet • 👥 6 User' };
+      if (p === 'premium') return { label: 'PREMIUM', badgeClass: 'premium', quota: '🏬 4 Outlet • 👥 9 User' };
+      return { label: 'TRIAL', badgeClass: 'trial', quota: '🏢 1 Outlet • 👥 3 User' };
+    }
+
+    async function loadTenants() {
+      const tbody = document.getElementById('tenant-table-body');
+      try {
+        const res = await fetch(`${CF_API_URL}/api/admin/tenants`);
+        const result = await res.json();
+
+        if (!result.success || !Array.isArray(result.data)) {
+          throw new Error('Gagal memuat data');
+        }
+
+        const tenants = result.data;
+        let totalOrders = 0;
+        let totalRev = 0;
+
+        document.getElementById('stat-total-tenants').textContent = tenants.length;
+
+        if (tenants.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">Belum ada perusahaan terdaftar.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = tenants.map(t => {
+          totalOrders += (t.total_orders || 0);
+          totalRev += (t.total_revenue || 0);
+          const planInfo = getPlanQuotaInfo(t.plan);
+
+          return `
+            <tr>
+              <td><strong style="color: #38bdf8; font-family: monospace; font-size: 14px;">${t.tenant_code}</strong></td>
+              <td>
+                <strong style="font-size: 14px;">${t.name}</strong>
+                <div style="font-size: 11px; color: #94a3b8;">${t.phone || '-'}</div>
+              </td>
+              <td><span class="plan-badge ${planInfo.badgeClass}">${planInfo.label}</span></td>
+              <td><strong style="color: #cbd5e1; font-size: 12.5px;">${planInfo.quota}</strong></td>
+              <td><span class="${t.status === 'active' ? 'status-active' : 'status-suspended'}">● ${t.status === 'active' ? 'Aktif' : 'Nonaktif'}</span></td>
+              <td><strong>${t.total_orders || 0}</strong> pesanan</td>
+              <td><strong style="color: #34d399;">Rp ${(t.total_revenue || 0).toLocaleString('id-ID')}</strong></td>
+              <td style="font-size: 12px; color: #94a3b8;">${t.expires_at ? t.expires_at.slice(0, 10) : 'Aktif'}</td>
+              <td>
+                <div style="display: flex; gap: 6px;">
+                  <button class="btn-secondary" style="padding: 5px 10px; font-size: 11px; background: #0284c7; color: #fff; border: none;" onclick="openEditPlanModal('${t.tenant_code}', '${t.name.replace(/'/g, "\\'")}', '${t.plan || 'standard'}', '${t.status || 'active'}')">
+                    ⚙️ Ubah Lisensi
+                  </button>
+                  <button class="btn-secondary" style="padding: 5px 8px; font-size: 11px; background: #334155; color: #fff; border: none;" onclick="navigator.clipboard.writeText('${t.tenant_code}'); showToast('Kode ${t.tenant_code} disalin!', 'success')" title="Salin Kode Toko">
+                    📋
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        document.getElementById('stat-total-transactions').textContent = totalOrders;
+        document.getElementById('stat-total-revenue').textContent = `Rp ${totalRev.toLocaleString('id-ID')}`;
+
+      } catch (err) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" style="text-align: center; padding: 24px; color: #f87171;">
+              Belum terhubung ke Cloudflare API (${err.message}).<br>
+              <span style="font-size: 11px; color: #94a3b8;">Data lokal demo tetap aman. Silakan periksa koneksi Cloudflare D1.</span>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    document.getElementById('form-tenant').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const plan = document.getElementById('add-company-plan').value;
+      const companyName = document.getElementById('add-company-name').value.trim();
+      const companyCode = document.getElementById('add-company-code').value.trim().toUpperCase();
+      const ownerName = document.getElementById('add-owner-name').value.trim();
+      const username = document.getElementById('add-owner-username').value.trim();
+      const password = document.getElementById('add-owner-pin').value.trim();
+      const phone = document.getElementById('add-phone').value.trim();
+
+      try {
+        const res = await fetch(`${CF_API_URL}/api/auth/register-company`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ companyName, companyCode, ownerName, username, password, phone, plan })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.message || 'Gagal mendaftar');
+
+        showToast(`Perusahaan "${companyName}" dengan lisensi ${plan.toUpperCase()} berhasil dibuat!`, 'success');
+        closeModal();
+        loadTenants();
+      } catch (err) {
+        showToast('Gagal: ' + err.message, 'error');
+      }
+    });
+
+    document.getElementById('form-edit-plan').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const tenantCode = document.getElementById('edit-plan-tenant-code').value;
+      const plan = document.getElementById('edit-plan-select').value;
+      const status = document.getElementById('edit-status-select').value;
+
+      try {
+        const res = await fetch(`${CF_API_URL}/api/admin/update-tenant-plan`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tenantCode, plan, status })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.message || 'Gagal memperbarui lisensi');
+
+        showToast(`Lisensi perusahaan ${tenantCode} diubah ke ${plan.toUpperCase()}!`, 'success');
+        closeEditPlanModal();
+        loadTenants();
+      } catch (err) {
+        showToast('Gagal: ' + err.message, 'error');
+      }
+    });
+
+    // Super Admin Auth Gate
+    const adminOverlay = document.getElementById('admin-auth-overlay');
+    const adminMainView = document.getElementById('admin-main-view');
+
+    function checkSuperAdminAuth() {
+      const isAuth = sessionStorage.getItem('paypos_superadmin_auth');
+      if (isAuth === 'true') {
+        if (adminOverlay) adminOverlay.style.display = 'none';
+        if (adminMainView) adminMainView.style.display = 'block';
+        loadTenants();
+      } else {
+        if (adminOverlay) adminOverlay.style.display = 'flex';
+        if (adminMainView) adminMainView.style.display = 'none';
+      }
+    }
+
+    document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const u = document.getElementById('sa-username').value.trim();
+      const p = document.getElementById('sa-password').value.trim();
+
+      showToast('Memverifikasi akun Super Admin ke database...', 'info');
+
+      // 1. Verifikasi ke Cloudflare Database D1 jika online
+      if (navigator.onLine && CF_API_URL) {
+        try {
+          const res = await fetch(`${CF_API_URL}/api/admin/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: u, password: p })
+          });
+
+          const data = await res.json();
+          if (res.ok && data.success) {
+            sessionStorage.setItem('paypos_superadmin_auth', 'true');
+            showToast('✅ Login Super Admin Berhasil!', 'success');
+            checkSuperAdminAuth();
+            return;
+          } else {
+            showToast(data.message || 'Username atau Password salah!', 'error');
+            return;
+          }
+        } catch (netErr) {
+          console.warn('[Admin Auth Offline Fallback]', netErr.message);
+        }
+      }
+
+      // 2. Fallback offline
+      if (u.toLowerCase() === 'tri' && p === 'admin') {
+        sessionStorage.setItem('paypos_superadmin_auth', 'true');
+        showToast('✅ Login Super Admin Berhasil (Offline)!', 'success');
+        checkSuperAdminAuth();
+      } else {
+        showToast('Username atau Password Super Admin salah!', 'error');
+      }
+    });
+
+    // Toggle Password Visibility (Eye Icon)
+    const togglePassBtn = document.getElementById('toggle-sa-password');
+    const passInput = document.getElementById('sa-password');
+    if (togglePassBtn && passInput) {
+      togglePassBtn.addEventListener('click', () => {
+        const isPassword = passInput.type === 'password';
+        passInput.type = isPassword ? 'text' : 'password';
+        togglePassBtn.textContent = isPassword ? '🙈' : '👁️';
+        togglePassBtn.title = isPassword ? 'Sembunyikan Password' : 'Lihat Password';
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Pastikan input selalu bersih dari autofill bawaan browser / cache
+      const saU = document.getElementById('sa-username');
+      const saP = document.getElementById('sa-password');
+      if (saU) saU.value = '';
+      if (saP) saP.value = '';
+      
+      // Bersihkan juga jika browser melakukan autofill terlambat (delay 100ms)
+      setTimeout(() => {
+        if (saU) saU.value = '';
+        if (saP) saP.value = '';
+      }, 100);
+
+      checkSuperAdminAuth();
+      updateAdminCloudflareUI();
+
+      // Realtime Live Polling setiap 5 detik saat Super Admin sedang membuka halaman
+      setInterval(() => {
+        const isAuth = sessionStorage.getItem('paypos_superadmin_auth');
+        if (isAuth === 'true' && navigator.onLine) {
+          loadTenants();
+        }
+      }, 5000);
+    });
+  </script>
+</body>
+</html>

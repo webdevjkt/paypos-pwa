@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PayPOS - Aplikasi Kasir POS & PWA Multi-Platform</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="description" content="PayPOS - Sistem Kasir Point of Sale Modern Offline-Ready. Dapat di-install langsung di Android, iOS, Windows, dan Mac.">
+  <meta name="theme-color" content="#4f46e5">
+  <meta name="mobile-web-app-capable" content="yes">
+  <!-- iOS / Safari PWA Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="PayPOS">
+  <meta name="format-detection" content="telephone=no">
+  
+  <link rel="manifest" href="./manifest.webmanifest?v=20260831">
+  <!-- Apple Touch Icons (iOS requires these specific sizes) -->
+  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=20260831">
+  <link rel="apple-touch-icon" sizes="120x120" href="./icons/icon-192.png?v=20260831">
+  <link rel="apple-touch-icon" sizes="152x152" href="./icons/icon-192.png?v=20260831">
+  <link rel="apple-touch-icon" sizes="167x167" href="./icons/icon-192.png?v=20260831">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-192.png?v=20260831">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=20260831">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png?v=20260831">
+
+  <!-- Google Fonts & Stylesheet -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+  <div class="landing-wrapper">
+    <!-- Navbar -->
+    <header class="landing-navbar">
+      <a href="index.html" class="landing-brand">
+        <div class="auth-logo" style="background: transparent; border: none; box-shadow: none; overflow: hidden; padding: 0;">
+          <img src="./icons/logo.png" alt="PayPOS Logo" style="width: 100%; height: 100%; object-fit: contain; border-radius: var(--radius-md);">
+        </div>
+        <div>
+          <strong style="font-size: 18px; letter-spacing: -0.5px; color: #0f172a;">PayPOS</strong>
+          <span style="font-size: 11px; color: #64748b; display: block; font-weight: 600;">Multi-Platform POS</span>
+        </div>
+      </a>
+
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="trigger-pwa-install pwa-install-btn" style="display: inline-flex; padding: 10px 18px;">
+          <span>📲</span>
+          <span>Install Aplikasi (PWA)</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <div class="landing-body">
+      <!-- Left Column: Hero Information & PWA Download Button -->
+      <div class="hero-text">
+        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 999px; font-size: 12px; font-weight: 700; color: #4338ca; margin-bottom: 16px;">
+          <span>🚀</span> Aplikasi Kasir Berbasis Progressive Web App (PWA)
+        </div>
+
+        <h1>Kelola Kasir & Usaha <span>Offline di Semua Device</span></h1>
+        
+        <p>
+          PayPOS adalah sistem kasir modern yang dapat langsung di-install di <strong>Android, iPhone, Windows, dan Mac</strong> tanpa instalasi rumit. Bekerja 100% offline, hemat kuota, dan cepat!
+        </p>
+
+        <!-- Feature Points -->
+        <div class="feature-list-grid">
+          <div class="feature-item-card">
+            <span class="icon">⚡</span>
+            <span>Kasir Cepat & Struk Thermal</span>
+          </div>
+          <div class="feature-item-card">
+            <span class="icon">📶</span>
+            <span>100% Bekerja Offline (IndexedDB)</span>
+          </div>
+          <div class="feature-item-card">
+            <span class="icon">📱</span>
+            <span>Install Langsung ke Homescreen</span>
+          </div>
+          <div class="feature-item-card">
+            <span class="icon">📊</span>
+            <span>Laporan Laba & Export CSV</span>
+          </div>
+        </div>
+
+        <!-- Direct Install Buttons Row -->
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="trigger-pwa-install hero-install-btn">
+            <span>📲</span>
+            <span>Install Aplikasi Sekarang (PWA)</span>
+          </button>
+          
+          <button class="hero-pos-btn" onclick="window.payposLanding.showInstallGuideModal()">
+            <span>📖</span>
+            <span>Panduan Pasang di HP / Laptop</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Column: Login & Register Card -->
+      <div class="auth-column">
+        <!-- If already logged in, show quick proceed card -->
+        <div id="logged-in-banner" class="auth-card" style="display: none; text-align: center; background: #ffffff; border: 2px solid #a7f3d0;">
+          <div style="font-size: 48px;">👋</div>
+          <div>
+            <h3 style="font-size: 20px; font-weight: 800; color: #0f172a;">Selamat Datang, <span id="logged-user-name" style="color: var(--primary);">User</span>!</h3>
+            <p style="font-size: 13px; color: #64748b; margin-top: 4px;">Anda sudah memiliki sesi kasir yang aktif.</p>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 8px;">
+            <a href="pos.html" class="auth-submit-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <span>🛒</span>
+              <span>Buka Terminal Kasir (POS)</span>
+            </a>
+            <button class="btn-secondary" onclick="window.payposLanding.logout()">
+              Ganti Akun / Logout
+            </button>
+          </div>
+        </div>
+
+        <!-- Auth Form Container -->
+        <div id="auth-forms-container" class="auth-card">
+          <div class="auth-header">
+            <h3 style="font-size: 20px; font-weight: 800; color: #0f172a;">Masuk ke Kasir</h3>
+            <p class="auth-subtitle">Silakan login untuk mengakses terminal kasir POS</p>
+          </div>
+
+          <!-- Tab switch -->
+          <div class="auth-tabs">
+            <button id="landing-tab-login" class="auth-tab-btn active">Masuk Kasir</button>
+            <button id="landing-tab-register" class="auth-tab-btn">Daftar Toko Baru</button>
+          </div>
+
+          <!-- FORM LOGIN (MULTI-TENANT SAAS) -->
+          <form id="landing-form-login" class="auth-form" autocomplete="off">
+            <div class="auth-input-group">
+              <label for="landing-login-company">Kode Perusahaan / Toko</label>
+              <input type="text" id="landing-login-company" class="auth-input" placeholder="Contoh: DEMO atau KOPI88" style="text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;" required autocomplete="off">
+            </div>
+
+            <div class="auth-input-group">
+              <label for="landing-login-username">Username User</label>
+              <input type="text" id="landing-login-username" class="auth-input" placeholder="Contoh: kasir1 atau admin" required autocomplete="off">
+            </div>
+
+            <div class="auth-input-group">
+              <label for="landing-login-pin">Password / PIN</label>
+              <div style="position: relative; display: flex; align-items: center;">
+                <input type="password" id="landing-login-pin" class="auth-input" style="padding-right: 42px; width: 100%;" placeholder="Masukkan password / PIN" maxlength="30" required autocomplete="new-password">
+                <button type="button" id="toggle-landing-login-pin" style="position: absolute; right: 10px; background: none; border: none; font-size: 18px; cursor: pointer; color: #64748b; padding: 4px;" title="Lihat Password">
+                  👁️
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="auth-submit-btn">
+              🚀 Masuk ke Kasir POS
+            </button>
+          </form>
+
+          <!-- FORM REGISTER TOKO BARU (SAAS) -->
+          <form id="landing-form-register" class="auth-form" style="display: none;">
+            <div class="auth-input-group">
+              <label for="landing-reg-store">Nama Perusahaan / Brand Toko *</label>
+              <input type="text" id="landing-reg-store" class="auth-input" placeholder="Contoh: Kopi Janji Kita" required>
+            </div>
+
+            <div class="auth-input-group">
+              <label for="landing-reg-company-code">Kode Toko Unik (Untuk Login Kasir) *</label>
+              <input type="text" id="landing-reg-company-code" class="auth-input" placeholder="Contoh: KOPI-JK (Huruf & Angka)" style="text-transform: uppercase; font-weight: 700;" required>
+            </div>
+
+            <div class="auth-input-group">
+              <label for="landing-reg-name">Nama Pemilik / Owner *</label>
+              <input type="text" id="landing-reg-name" class="auth-input" placeholder="Contoh: Hendra Wijaya" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="auth-input-group">
+                <label for="landing-reg-username">Username Owner *</label>
+                <input type="text" id="landing-reg-username" class="auth-input" placeholder="admin" required>
+              </div>
+
+              <div class="auth-input-group">
+                <label for="landing-reg-pin">Password / PIN *</label>
+                <input type="password" id="landing-reg-pin" class="auth-input" placeholder="Password" required>
+              </div>
+            </div>
+
+            <div class="auth-input-group">
+              <label for="landing-reg-phone">Nomor WhatsApp Toko</label>
+              <input type="tel" id="landing-reg-phone" class="auth-input" placeholder="081234567890">
+            </div>
+
+            <button type="submit" class="auth-submit-btn">
+              ✨ Daftarkan Perusahaan & Mulai Kasir
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Panduan & Install PWA Multi-Platform -->
+  <div id="modal-install-guide" class="modal-overlay">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3>Cara Install Aplikasi PayPOS</h3>
+        <button class="modal-close-btn" data-modal-close>✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-muted);">
+          PayPOS dibuat menggunakan teknologi <strong>Progressive Web App (PWA)</strong>, sehingga dapat dipasang langsung di semua jenis perangkat tanpa perlu download dari PlayStore/AppStore:
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+          <!-- Android -->
+          <div style="padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-subtle);">
+            <strong style="font-size: 14px; color: var(--primary);">📱 Android (Google Chrome)</strong>
+            <ol style="margin-left: 18px; margin-top: 6px; font-size: 12px; color: var(--text-main); line-height: 1.6;">
+              <li>Buka halaman ini di browser Google Chrome.</li>
+              <li>Klik tombol hijau <strong>"Install Aplikasi"</strong> atau tekan menu titik tiga <strong>(⋮)</strong> di kanan atas.</li>
+              <li>Pilih <strong>"Tambahkan ke Layar Utama" (Add to Home screen)</strong> / <strong>"Install Aplikasi"</strong>.</li>
+            </ol>
+          </div>
+
+          <!-- Windows / Mac -->
+          <div style="padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-subtle);">
+            <strong style="font-size: 14px; color: var(--primary);">💻 Laptop / PC (Chrome & Edge)</strong>
+            <ol style="margin-left: 18px; margin-top: 6px; font-size: 12px; color: var(--text-main); line-height: 1.6;">
+              <li>Buka di browser Google Chrome atau Microsoft Edge.</li>
+              <li>Klik ikon <strong>Install (🖥️ / ➕)</strong> yang muncul di bagian kanan bilah alamat URL.</li>
+              <li>Klik <strong>"Install"</strong> dan aplikasi kasir akan langsung muncul di Desktop.</li>
+            </ol>
+          </div>
+
+          <!-- iOS -->
+          <div style="padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-subtle);">
+            <strong style="font-size: 14px; color: var(--primary);">🍎 iPhone / iPad (Safari)</strong>
+            <ol style="margin-left: 18px; margin-top: 6px; font-size: 12px; color: var(--text-main); line-height: 1.6;">
+              <li>Buka di browser <strong>Safari</strong>.</li>
+              <li>Tekan tombol <strong>Share</strong> (ikon kotak dengan panah ke atas di bilah bawah).</li>
+              <li>Gulir ke bawah dan pilih <strong>"Tambahkan ke Layar Utama" (Add to Home Screen)</strong>.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" data-modal-close>Saya Mengerti</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="./js/db.js"></script>
+  <script src="./js/audio.js"></script>
+  <script src="./js/auth.js"></script>
+
+  <script>
+    // =============================================
+    // Service Worker Registration (WAJIB untuk iOS)
+    // =============================================
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('[SW] Registered, scope:', reg.scope))
+          .catch(err => console.warn('[SW] Registration failed:', err));
+      });
+    }
+
+    // =============================================
+    // iOS Safari: Tampilkan banner panduan install
+    // =============================================
+    function isIOS() {
+      return /iphone|ipad|ipod/i.test(navigator.userAgent);
+    }
+    function isInStandaloneMode() {
+      return window.navigator.standalone === true;
+    }
+    function isSafari() {
+      return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (isIOS() && isSafari() && !isInStandaloneMode()) {
+        // Create iOS install banner
+        const banner = document.createElement('div');
+        banner.id = 'ios-install-banner';
+        banner.innerHTML = `
+          <div style="
+            position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+            background: #1e293b; color: #fff;
+            border-radius: 16px; padding: 14px 18px;
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            z-index: 9999; max-width: 340px; width: calc(100vw - 32px);
+            font-family: -apple-system, sans-serif; font-size: 13px; line-height: 1.4;
+            animation: slideUp 0.4s ease;
+          ">
+            <div style="font-size: 28px; flex-shrink:0;">📲</div>
+            <div style="flex:1;">
+              <strong style="display:block; font-size:14px; margin-bottom:2px;">Install PayPOS di iPhone</strong>
+              Tekan <strong>Share</strong> <span style="font-size:16px;">⬆️</span> lalu pilih <strong>"Add to Home Screen"</strong>
+            </div>
+            <button onclick="document.getElementById('ios-install-banner').remove()" style="
+              background: none; border: none; color: #94a3b8;
+              font-size: 20px; cursor: pointer; padding: 4px; flex-shrink: 0;
+            ">✕</button>
+          </div>
+          <style>@keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }</style>
+        `;
+        document.body.appendChild(banner);
+
+        // Auto-hide after 12 seconds
+        setTimeout(() => banner.remove(), 12000);
+      }
+    });
+  </script>
+</body>
+</html>

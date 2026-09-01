@@ -1,0 +1,13 @@
+{
+  "name": "paypos-pwa",
+  "version": "1.0.0",
+  "description": "PayPOS - Offline-Ready PWA Cashier Application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["pos", "pwa", "cashier", "offline-first"],
+  "author": "",
+  "license": "MIT"
+}
