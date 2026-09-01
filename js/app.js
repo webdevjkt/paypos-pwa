@@ -335,25 +335,41 @@ class PayPOSApp {
 
     const pwaBtnSidebar = document.getElementById('pwa-install-btn');
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
+    const setupPrompt = (e) => {
       this.deferredPrompt = e;
+      window.deferredPWAInstallPrompt = e;
       if (pwaBtnSidebar) {
         pwaBtnSidebar.style.display = 'flex';
-        pwaBtnSidebar.addEventListener('click', async () => {
-          if (this.deferredPrompt) {
-            this.deferredPrompt.prompt();
-            const { outcome } = await this.deferredPrompt.userChoice;
-            console.log(`[PWA] User choice: ${outcome}`);
-            this.deferredPrompt = null;
-            pwaBtnSidebar.style.display = 'none';
-          }
-        });
       }
+    };
+
+    if (window.deferredPWAInstallPrompt) {
+      setupPrompt(window.deferredPWAInstallPrompt);
+    }
+
+    if (pwaBtnSidebar) {
+      pwaBtnSidebar.addEventListener('click', async () => {
+        const promptEvent = this.deferredPrompt || window.deferredPWAInstallPrompt;
+        if (promptEvent) {
+          promptEvent.prompt();
+          const { outcome } = await promptEvent.userChoice;
+          console.log(`[PWA] User choice: ${outcome}`);
+          this.deferredPrompt = null;
+          window.deferredPWAInstallPrompt = null;
+          pwaBtnSidebar.style.display = 'none';
+        }
+      });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      setupPrompt(e);
     });
 
     window.addEventListener('appinstalled', () => {
       this.showToast('PayPOS berhasil diinstall di perangkat Anda!', 'success');
+      this.deferredPrompt = null;
+      window.deferredPWAInstallPrompt = null;
       if (pwaBtnSidebar) pwaBtnSidebar.style.display = 'none';
     });
   }

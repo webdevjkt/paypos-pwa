@@ -209,39 +209,50 @@ class PayPOSLanding {
     }
 
     // ─── Android / Desktop Chrome: gunakan beforeinstallprompt ───
+    const updateButtonsReady = () => {
+      installBtns.forEach((btn) => {
+        btn.innerHTML = '<span>📲</span><span>Install Aplikasi (PWA)</span>';
+        btn.disabled = false;
+      });
+    };
+
+    if (window.deferredPWAInstallPrompt) {
+      this.deferredPrompt = window.deferredPWAInstallPrompt;
+      updateButtonsReady();
+    }
+
     const triggerInstall = async () => {
-      if (this.deferredPrompt) {
-        this.deferredPrompt.prompt();
-        const { outcome } = await this.deferredPrompt.userChoice;
+      const promptEvent = this.deferredPrompt || window.deferredPWAInstallPrompt;
+      if (promptEvent) {
+        promptEvent.prompt();
+        const { outcome } = await promptEvent.userChoice;
         console.log(`[PWA] Install outcome: ${outcome}`);
-        if (outcome === 'dismissed') {
+        if (outcome === 'accepted') {
+          this.showToast('🎉 Menginstall PayPOS...', 'success');
+        } else {
           this.showToast('Install dibatalkan. Tekan tombol kapan saja untuk mencoba lagi.', 'info');
         }
         this.deferredPrompt = null;
+        window.deferredPWAInstallPrompt = null;
       } else {
-        // Prompt belum tersedia (sudah install, atau belum memenuhi syarat)
         this.showInstallGuideModal();
       }
     };
 
     installBtns.forEach((btn) => btn.addEventListener('click', triggerInstall));
 
-    // Simpan prompt ketika browser siap
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       this.deferredPrompt = e;
+      window.deferredPWAInstallPrompt = e;
       console.log('[PWA] Install prompt available');
-      installBtns.forEach((btn) => {
-        btn.innerHTML = '<span>📲</span><span>Install Aplikasi Sekarang</span>';
-        btn.style.animation = 'pulse 2s infinite';
-        btn.disabled = false;
-      });
+      updateButtonsReady();
     });
 
-    // Berhasil diinstall
     window.addEventListener('appinstalled', () => {
       this.showToast('🎉 PayPOS berhasil diinstall di perangkat Anda!', 'success');
       this.deferredPrompt = null;
+      window.deferredPWAInstallPrompt = null;
       installBtns.forEach((btn) => {
         btn.innerHTML = '<span>✅</span><span>Aplikasi Sudah Terpasang!</span>';
         btn.style.background = 'linear-gradient(135deg, #059669, #047857)';

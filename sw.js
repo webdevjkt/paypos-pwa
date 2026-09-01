@@ -1,8 +1,9 @@
-const CACHE_NAME = 'paypos-cache-v1.4.0-newlogo';
+const CACHE_NAME = 'paypos-cache-v1.5.0-pwa-fix';
 const STATIC_ASSETS = [
   './',
   './index.html',
   './pos.html',
+  './manifest.json',
   './manifest.webmanifest',
   './css/style.css',
   './js/db.js',
